@@ -34,6 +34,8 @@
             this.beendenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ItemsTreeView = new System.Windows.Forms.TreeView();
             this.itemContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.internToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.execSkriptToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -42,10 +44,11 @@
             this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.dateiToolStripMenuItem});
+            this.dateiToolStripMenuItem,
+            this.internToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1434, 33);
+            this.menuStrip1.Size = new System.Drawing.Size(567, 33);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -65,9 +68,10 @@
             // 
             // ItemsTreeView
             // 
-            this.ItemsTreeView.Location = new System.Drawing.Point(12, 36);
+            this.ItemsTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ItemsTreeView.Location = new System.Drawing.Point(0, 33);
             this.ItemsTreeView.Name = "ItemsTreeView";
-            this.ItemsTreeView.Size = new System.Drawing.Size(1410, 773);
+            this.ItemsTreeView.Size = new System.Drawing.Size(567, 619);
             this.ItemsTreeView.TabIndex = 1;
             this.ItemsTreeView.DoubleClick += new System.EventHandler(this.ItemsTreeView_DoubleClick);
             // 
@@ -77,11 +81,26 @@
             this.itemContextMenu.Name = "itemContextMenu";
             this.itemContextMenu.Size = new System.Drawing.Size(61, 4);
             // 
+            // internToolStripMenuItem
+            // 
+            this.internToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.execSkriptToolStripMenuItem});
+            this.internToolStripMenuItem.Name = "internToolStripMenuItem";
+            this.internToolStripMenuItem.Size = new System.Drawing.Size(74, 29);
+            this.internToolStripMenuItem.Text = "Intern";
+            // 
+            // execSkriptToolStripMenuItem
+            // 
+            this.execSkriptToolStripMenuItem.Name = "execSkriptToolStripMenuItem";
+            this.execSkriptToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.execSkriptToolStripMenuItem.Text = "ExecSkript";
+            this.execSkriptToolStripMenuItem.Click += new System.EventHandler(this.execSkriptToolStripMenuItem_Click);
+            // 
             // HeySteimkeStart
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1434, 821);
+            this.ClientSize = new System.Drawing.Size(567, 652);
             this.Controls.Add(this.ItemsTreeView);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -102,6 +121,8 @@
         private System.Windows.Forms.ToolStripMenuItem beendenToolStripMenuItem;
         private System.Windows.Forms.TreeView ItemsTreeView;
         private System.Windows.Forms.ContextMenuStrip itemContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem internToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem execSkriptToolStripMenuItem;
     }
 }
 

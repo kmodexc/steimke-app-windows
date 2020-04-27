@@ -1,4 +1,6 @@
 ﻿using HeySteimke.Models;
+using HeySteimke.Services;
+using HeySteimke.Services.Rest.HeySteimkeUser;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -86,16 +88,17 @@ namespace HeySteimkeWindows
         {
             var placeNode = ItemsTreeView.SelectedNode.Tag as Place;
             var itemNode = ItemsTreeView.SelectedNode.Tag as Item;
-            if(itemNode != null)
+            if (itemNode != null)
             {
                 var idp = new ItemDetailForm(itemNode);
                 idp.ShowDialog(this);
                 await LoadData();
-            }else if(placeNode != null)
+            }
+            else if (placeNode != null)
             {
                 var userv = await ResourceManager.DataStore.GetUserServiceAsync();
                 await userv.SetPlaceAsync(placeNode.Id);
-                var item = new HeySteimke.Models.Item(-1, ItemState.created,"HeySteimkeWindowsItem");
+                var item = new HeySteimke.Models.Item(-1, ItemState.created, "HeySteimkeWindowsItem");
                 var iserv = await ResourceManager.DataStore.GetItemsServiceAsync();
                 await iserv.Create(item);
                 var idp = new ItemDetailForm(item);
@@ -106,6 +109,31 @@ namespace HeySteimkeWindows
             {
                 System.Diagnostics.Debug.WriteLine("No Handler for this");
             }
+        }
+
+        private async void execSkriptToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var userv = await ResourceManager.DataStore.GetUserServiceAsync();
+            var pserv = await ResourceManager.DataStore.GetPlacesServiceAsync();
+            var iserv = await ResourceManager.DataStore.GetItemsServiceAsync();
+            var dataBase = new DataStore();
+            var urest = new HeySteimkeUserClient(null);
+            string str = "";
+
+
+            var users = await userv.GetAllAsync();
+
+            foreach (var it in users)
+            {
+                str += it.Name + " " + it.Id + "\n";
+                if (it.Id == 15 || it.Id == 16)
+                {
+                    str += "delete: "+it.Name + " " + it.Id + "\n";
+                    //urest.DeleteUser(it.Id);
+                }
+            }
+
+            MessageBox.Show(str);
         }
     }
 }

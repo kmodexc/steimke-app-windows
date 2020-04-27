@@ -157,8 +157,18 @@ namespace HeySteimke.Services
 
         public async Task<Person> GetUserAsync(int id)
         {
-            var restuser = await api_user.GetUserAsync(id);
-            return restBase.toAppUser(restuser);
+            try
+            {
+
+                var restuser = await api_user.GetUserAsync(id);
+                return restBase.toAppUser(restuser);
+            }
+            catch(Exception exc)
+            {
+                Debug.WriteLine("Error while get user");
+                Debug.WriteLine(exc);
+            }
+            return new Person();
         }
         public async Task<bool> UpdateItemAsync(Item item)
         {

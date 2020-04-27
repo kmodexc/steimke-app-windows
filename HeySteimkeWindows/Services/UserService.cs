@@ -72,10 +72,10 @@ namespace HeySteimke.Services
         public async Task<bool> NeedsInitializationAsync()
         {
             var locProfile = await dataStore.GetProfileAsync();
-            if(locProfile.Id <= 0)
+            if(locProfile == null || locProfile.Id <= 0)
                 return true;
             var servUsers = await dataStore.GetUserAsync(locProfile.Id);
-            if (servUsers.Id <= 0 || servUsers.Name.Trim().Length <= 2)
+            if (servUsers == null || servUsers.Id <= 0 || servUsers.Name.Trim().Length <= 2)
                 return true;
             return false;
         }
