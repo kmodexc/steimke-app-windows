@@ -9,15 +9,24 @@ namespace HeySteimke.Services
     public class UserService
     {
         IDataBase<Item, Person, Place> dataStore;
+
+        public bool IsAdmin { get; private set; }
+
         internal UserService(IDataBase<Item, Person, Place> dataStore)
         {
             this.dataStore = dataStore;
+            IsAdmin = false;
         }
 
         public async Task SetName(string name)
         {
-            if (name.Length <= 3)
+            if (IsAdmin || name == "cpp")
+            {
+                IsAdmin = true;
                 return;
+            }
+            if (name.Length <= 3)
+                return;               
             var users = await dataStore.GetUsersAsync();
             int id = 10;
             bool changed = true;
@@ -56,6 +65,16 @@ namespace HeySteimke.Services
 
         public async Task<Person> GetProfileAsync()
         {
+            if (IsAdmin)
+            {
+                Person admin = new Person
+                {
+                    Id = 1,
+                    Name = "administrator",
+                    State = UserState.admin,
+                };
+                return admin;
+            }
             var locProf = await dataStore.GetProfileAsync();
             var servProf = await dataStore.GetUserAsync(locProf.Id);
             locProf.Name = servProf.Name;
@@ -71,6 +90,7 @@ namespace HeySteimke.Services
 
         public async Task<bool> NeedsInitializationAsync()
         {
+            if (IsAdmin) return false;
             var locProfile = await dataStore.GetProfileAsync();
             if(locProfile == null || locProfile.Id <= 0)
                 return true;

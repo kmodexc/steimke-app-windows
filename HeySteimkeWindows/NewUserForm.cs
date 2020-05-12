@@ -37,5 +37,13 @@ namespace HeySteimkeWindows
         private void NewUserForm_FormClosing(object sender, FormClosingEventArgs e)
         {
         }
+
+        private void nameTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                okButton_Click(sender, null);
+            }
+        }
     }
 }

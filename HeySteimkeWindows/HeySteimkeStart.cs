@@ -34,7 +34,6 @@ namespace HeySteimkeWindows
             {
                 var mf = new NewUserForm();
                 mf.ShowDialog(this);
-                return;
             }
             var places = await pserv.GetAllAsync();
             var root = ItemsTreeView.Nodes;
@@ -86,6 +85,7 @@ namespace HeySteimkeWindows
 
         private async void ItemsTreeView_DoubleClick(object sender, EventArgs e)
         {
+            if (ItemsTreeView.SelectedNode == null) return;
             var placeNode = ItemsTreeView.SelectedNode.Tag as Place;
             var itemNode = ItemsTreeView.SelectedNode.Tag as Item;
             if (itemNode != null)
@@ -120,16 +120,43 @@ namespace HeySteimkeWindows
             var urest = new HeySteimkeUserClient(null);
             string str = "";
 
+            if (!userv.IsAdmin) return;
 
             var users = await userv.GetAllAsync();
 
             foreach (var it in users)
             {
-                str += it.Name + " " + it.Id + "\n";
-                if (it.Id == 15 || it.Id == 16)
+
+                if (it.Name == "Corrie")
                 {
-                    str += "delete: "+it.Name + " " + it.Id + "\n";
-                    //urest.DeleteUser(it.Id);
+                    //str += it.Name + " " + it.Id + "\n";
+                    //str += "delete: " + it.Name + " " + it.Id + "\n";
+                    try
+                    {
+                        //urest.DeleteUser(it.Id);
+                    }
+                    catch (Exception) { }
+                }
+                //if(it.Id == 11)
+                //{
+                //    str += "rename " + it.Name + " " + it.Id + "\n";
+                //    it.Name = "Ruben";
+                //    RestBase rbase = new RestBase();
+                //    //urest.ReplaceUser(it.Id, rbase.toRestUser(it));
+                //}
+            }
+
+            var items = await dataBase.GetItemsAsync();
+
+            foreach (var it in items)
+            {
+                if (it.CreatorId == 10)
+                {
+                    if (it.Id >= 78 || it.Id == 8)
+                    {
+                        str += it.Name + " " + it.Id + " " + it.Placeid + "\n";
+                        //await iserv.Delete(it);
+                    }
                 }
             }
 

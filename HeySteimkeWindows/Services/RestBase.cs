@@ -4,7 +4,7 @@ using System.Text;
 
 namespace HeySteimke.Services
 {
-    class RestBase
+    public class RestBase
     {
         public HeySteimke.Rest.HeySteimkeBase.Models.Item toRestItem(Models.Item it)
         {
