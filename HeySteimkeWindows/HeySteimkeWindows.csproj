@@ -132,10 +132,6 @@
     <Compile Include="ItemDetailForm.Designer.cs">
       <DependentUpon>ItemDetailForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Models\HomeMenuItem.cs" />
-    <Compile Include="Models\Item.cs" />
-    <Compile Include="Models\Person.cs" />
-    <Compile Include="Models\Place.cs" />
     <Compile Include="NewUserForm.cs">
       <SubType>Form</SubType>
     </Compile>

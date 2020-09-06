@@ -1,6 +1,5 @@
 ﻿using HeySteimke.Models;
 using HeySteimke.Services;
-using HeySteimke.Services.Rest.HeySteimkeUser;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -117,10 +116,10 @@ namespace HeySteimkeWindows
             var pserv = await ResourceManager.DataStore.GetPlacesServiceAsync();
             var iserv = await ResourceManager.DataStore.GetItemsServiceAsync();
             var dataBase = new DataStore();
-            var urest = new HeySteimkeUserClient(null);
+            //var urest = new HeySteimkeUserClient(null);
             string str = "";
 
-            if (!userv.IsAdmin) return;
+            //if (!userv.IsAdmin) return;
 
             var users = await userv.GetAllAsync();
 
