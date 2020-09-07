@@ -17,19 +17,19 @@ namespace HeySteimkeWindows
         public async Task LoadData()
         {
             var userv = await ResourceManager.DataStore.GetUserServiceAsync();
-            if(item.CreatorId > 0)
+            if (item.CreatorId > 0)
             {
                 var creator = await userv.GetAsync(item.CreatorId.GetValueOrDefault());
-                createdLabel.Text = "Erstellt von "+creator.Name;
+                createdLabel.Text = "Erstellt von " + creator;
             }
             else
             {
                 createdLabel.Text = "[kein creator] ";
             }
-            if(item.AssignedId > 0)
+            if (item.AssignedId > 0)
             {
                 var assigned = await userv.GetAsync(item.AssignedId.GetValueOrDefault());
-                acceptedLabel.Text = "Angenommen von " + assigned.Name + " am " + TimeStampToString(item.AssignedTime);
+                acceptedLabel.Text = "Angenommen von " + assigned + " am " + TimeStampToString(item.AssignedTime);
             }
             else
             {
@@ -86,12 +86,17 @@ namespace HeySteimkeWindows
         private async void saveButton_Click(object sender, EventArgs e)
         {
             var iserv = await ResourceManager.DataStore.GetItemsServiceAsync();
-            if(iserv.Get(item.Id.GetValueOrDefault()) == null)
+            if (iserv.Get(item.Id.GetValueOrDefault()) == null)
             {
                 MessageBox.Show("DataStore not loaded");
-            }else if(iserv.Get(item.Id.GetValueOrDefault()).Id <= 10)
+            }
+            else if (iserv.Get(item.Id.GetValueOrDefault()).Id <= 10)
             {
                 MessageBox.Show("Item ID invalid");
+            }
+            else if (await iserv.CanEditAsync(item))
+            {
+                MessageBox.Show("No permission to edit");
             }
             else
             {

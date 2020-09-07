@@ -78,8 +78,8 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HeySteimkeDataLayer, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\HeySteimkeDataLayer.1.0.1\lib\netstandard2.0\HeySteimkeDataLayer.dll</HintPath>
+    <Reference Include="HeySteimkeDataLayer, Version=1.0.0.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\HeySteimkeDataLayer.1.0.4\lib\netstandard2.0\HeySteimkeDataLayer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Rest.ClientRuntime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Rest.ClientRuntime.2.3.21\lib\net461\Microsoft.Rest.ClientRuntime.dll</HintPath>
