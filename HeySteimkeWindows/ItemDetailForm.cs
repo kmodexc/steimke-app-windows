@@ -29,13 +29,13 @@ namespace HeySteimkeWindows
             if(item.AssignedId > 0)
             {
                 var assigned = await userv.GetAsync(item.AssignedId.GetValueOrDefault());
-                acceptedLabel.Text = "Angenommen von " + assigned.Name + " am " + TimeStampToString(item.Assignedtime);
+                acceptedLabel.Text = "Angenommen von " + assigned.Name + " am " + TimeStampToString(item.AssignedTime);
             }
             else
             {
                 this.acceptedLabel.Text = "";
             }
-            createdLabel.Text += " am " + TimeStampToString(item.Createtime);
+            createdLabel.Text += " am " + TimeStampToString(item.CreateTime);
             nameTextBox.Text = item.Name;
             descriptionTextBox.Text = item.Desc;
             switch (item.ItemState)
@@ -52,7 +52,7 @@ namespace HeySteimkeWindows
             }
         }
 
-        private string TimeStampToString(TimeStamp ts)
+        private string TimeStampToString(IO.Swagger.Model.TimeStamp ts)
         {
             return "" + ts.Day + "." + ts.Month + "." + ts.Year + " " + ts.Hour + ":" + ts.Minute + " Uhr";
         }
@@ -86,7 +86,19 @@ namespace HeySteimkeWindows
         private async void saveButton_Click(object sender, EventArgs e)
         {
             var iserv = await ResourceManager.DataStore.GetItemsServiceAsync();
-            await iserv.Update(item);
+            if(iserv.Get(item.Id.GetValueOrDefault()) == null)
+            {
+                MessageBox.Show("DataStore not loaded");
+            }else if(iserv.Get(item.Id.GetValueOrDefault()).Id <= 10)
+            {
+                MessageBox.Show("Item ID invalid");
+            }
+            else
+            {
+                item.Name = nameTextBox.Text;
+                item.Desc = descriptionTextBox.Text;
+                await iserv.Update(item);
+            }
             this.Close();
         }
     }

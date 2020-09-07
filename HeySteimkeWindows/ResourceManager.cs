@@ -15,7 +15,12 @@ namespace HeySteimkeWindows
             get
             {
                 if (dataStore == null)
-                    dataStore = new DataStore();
+                {
+                    var tmp_ds = new DataStore();
+                    var tsk = Task.Run(async ()=> await tmp_ds.LoadConfig());
+                    tsk.Wait();
+                    dataStore = tmp_ds;
+                }
                 return dataStore;
             }
         }

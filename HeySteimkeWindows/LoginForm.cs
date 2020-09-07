@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace HeySteimkeWindows
 {
-    public partial class NewUserForm : Form
+    public partial class LoginForm : Form
     {
-        public NewUserForm()
+        public LoginForm()
         {
             InitializeComponent();
         }
@@ -26,8 +26,14 @@ namespace HeySteimkeWindows
         private async Task SaveData()
         {
             var userv = await ResourceManager.DataStore.GetUserServiceAsync();
-            string name = nameTextBox.Text;
-            await userv.SetName(name.Trim());
+            var resutl = await userv.Login(nameTextBox.Text,passwordTextBox.Text);
+            if (resutl)
+            {
+                MessageBox.Show("Login Successful");
+            }else
+            {
+                MessageBox.Show("Error at Login");
+            }
         }
 
         private void NewUserForm_Load(object sender, EventArgs e)
