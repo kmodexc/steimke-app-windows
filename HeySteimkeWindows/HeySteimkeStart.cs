@@ -154,23 +154,39 @@ namespace HeySteimkeWindows
             var pserv = await ResourceManager.DataStore.GetPlacesServiceAsync();
             var iserv = await ResourceManager.DataStore.GetItemsServiceAsync();
             var dataBase = new DataStore();
-            //var urest = new HeySteimkeUserClient(null);
+            await dataBase.LoadConfig();
             string str = "";
 
-            //if (!userv.IsAdmin) return;
+            var tmp = await dataBase.GetPlacesAsync();
+            if(tmp == null)
+            {
+                MessageBox.Show("cant load places");
+                return;
+            }
+            var places = new List<Place>(tmp);
 
-            var users = await userv.GetAllAsync();
-
-            foreach (var it in users)
+            foreach (var it in places)
             {
 
-                if (it.Name == "Corrie")
+                if (string.IsNullOrWhiteSpace(it.Name) || it.Name == string.Empty)
                 {
-                    //str += it.Name + " " + it.Id + "\n";
+                    str += "Place:"+it.Name + " " + it.Id + "\n";
+                    foreach(var op in await iserv.GetOpen(it))
+                    {
+                        str += "Open:" + op.Name + "\n";
+                    }
+                    foreach (var op in await iserv.GetInProgress(it))
+                    {
+                        str += "Progress:" + op.Name + "\n";
+                    }
+                    foreach (var op in await iserv.GetFinished(it))
+                    {
+                        str += "Closed:" + op.Name + "\n";
+                    }
                     //str += "delete: " + it.Name + " " + it.Id + "\n";
                     try
                     {
-                        //urest.DeleteUser(it.Id);
+                        //await pserv.RemovePlaceAsync(it);
                     }
                     catch (Exception) { }
                 }
@@ -183,19 +199,19 @@ namespace HeySteimkeWindows
                 //}
             }
 
-            var items = await dataBase.GetItemsAsync();
+            //var items = await dataBase.GetItemsAsync();
 
-            foreach (var it in items)
-            {
-                if (it.CreatorId == 10)
-                {
-                    if (it.Id >= 78 || it.Id == 8)
-                    {
-                        str += it.Name + " " + it.Id + " " + it.PlaceId + "\n";
-                        //await iserv.Delete(it);
-                    }
-                }
-            }
+            //foreach (var it in items)
+            //{
+            //    if (it.CreatorId == 10)
+            //    {
+            //        if (it.Id >= 78 || it.Id == 8)
+            //        {
+            //            //str += it.Name + " " + it.Id + " " + it.PlaceId + "\n";
+            //            //await iserv.Delete(it);
+            //        }
+            //    }
+            //}
 
             MessageBox.Show(str);
         }
