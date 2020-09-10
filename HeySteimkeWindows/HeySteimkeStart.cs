@@ -2,12 +2,6 @@
 using HeySteimke.Services;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.Common;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -158,6 +152,7 @@ namespace HeySteimkeWindows
                 var item = new HeySteimke.Models.Item(-1, ItemState.created, "", "", "", -1, -1, 0, 0, p.Id);
                 await iserv.Create(item);
                 await openItemDetail(item);
+                await LoadData();
             }
             else
             {
@@ -189,6 +184,7 @@ namespace HeySteimkeWindows
                 {
                     System.Diagnostics.Debug.WriteLine("No Handler for this");
                 }
+                await LoadData();
             }
             catch (Exception exc)
             {
@@ -212,61 +208,13 @@ namespace HeySteimkeWindows
             await dataBase.LoadConfig();
             string str = "";
 
-            var tmp = await dataBase.GetPlacesAsync();
-            if (tmp == null)
+            // Work
+            var places = await dataBase.GetPlacesAsync();
+
+            foreach(var p in places)
             {
-                MessageBox.Show("cant load places");
-                return;
+                str += p.Id + "\t" + p.Name + "\t" + p.CreatorId + "\n";
             }
-            var places = new List<Place>(tmp);
-
-            foreach (var it in places)
-            {
-
-                if (string.IsNullOrWhiteSpace(it.Name) || it.Name == string.Empty)
-                {
-                    str += "Place:" + it.Name + " " + it.Id + "\n";
-                    foreach (var op in await iserv.GetOpen(it))
-                    {
-                        str += "Open:" + op.Name + "\n";
-                    }
-                    foreach (var op in await iserv.GetInProgress(it))
-                    {
-                        str += "Progress:" + op.Name + "\n";
-                    }
-                    foreach (var op in await iserv.GetFinished(it))
-                    {
-                        str += "Closed:" + op.Name + "\n";
-                    }
-                    //str += "delete: " + it.Name + " " + it.Id + "\n";
-                    try
-                    {
-                        //await pserv.RemovePlaceAsync(it);
-                    }
-                    catch (Exception) { }
-                }
-                //if(it.Id == 11)
-                //{
-                //    str += "rename " + it.Name + " " + it.Id + "\n";
-                //    it.Name = "Ruben";
-                //    RestBase rbase = new RestBase();
-                //    //urest.ReplaceUser(it.Id, rbase.toRestUser(it));
-                //}
-            }
-
-            //var items = await dataBase.GetItemsAsync();
-
-            //foreach (var it in items)
-            //{
-            //    if (it.CreatorId == 10)
-            //    {
-            //        if (it.Id >= 78 || it.Id == 8)
-            //        {
-            //            //str += it.Name + " " + it.Id + " " + it.PlaceId + "\n";
-            //            //await iserv.Delete(it);
-            //        }
-            //    }
-            //}
 
             MessageBox.Show(str);
         }
@@ -305,6 +253,7 @@ namespace HeySteimkeWindows
             if (itemNode == null) return;
 
             await openItemDetail(itemNode);
+            await LoadData();
         }
 
         private void ItemsTreeView_MouseDown(object sender, MouseEventArgs e)
@@ -323,6 +272,7 @@ namespace HeySteimkeWindows
             if (placeNode == null) return;
 
             await createItem(placeNode);
+            await LoadData();
         }
 
         private async Task deleteItem(Item it)
@@ -335,6 +285,7 @@ namespace HeySteimkeWindows
                 if (await iserv.CanDeleteAsync(it))
                 {
                     await iserv.Delete(it);
+                    await LoadData();
                 }
                 else
                 {
@@ -358,6 +309,7 @@ namespace HeySteimkeWindows
             var itemNode = node.Tag as Place;
             if (itemNode == null) return;
             await deletePlace(itemNode);
+            await LoadData();
         }
 
         private async Task deletePlace(Place itemNode)
@@ -370,6 +322,7 @@ namespace HeySteimkeWindows
                 if (await pserv.CanDeleteAsync(itemNode))
                 {
                     await pserv.RemovePlaceAsync(itemNode);
+                    await LoadData();
                 }
                 else
                 {
@@ -393,6 +346,125 @@ namespace HeySteimkeWindows
             var itemNode = node.Tag as Item;
             if (itemNode == null) return;
             await deleteItem(itemNode);
+            await LoadData();
+        }
+
+        private async void editPlaceMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode node = contextMenuHandlerGetNode(sender);
+            if (node == null) return;
+            var itemNode = node.Tag as Place;
+            if (itemNode == null) return;
+            var dialog = new PlaceDetailForm(itemNode);
+            dialog.ShowDialog(this);
+            await LoadData();
+        }
+
+        private async Task LoadUserView(bool refresh = false)
+        {
+            if (IsBusy) return;
+            IsBusy = true;
+
+            try
+            {
+                var userv = await ResourceManager.DataStore.GetUserServiceAsync();
+
+                if (!await userv.CanEditUserUserAsync())
+                {
+                    MessageBox.Show("access denied");
+                    IsBusy = false;
+                    return;
+                }
+                else
+                {
+                    var root = ItemsTreeView.Nodes;
+                    root.Clear();
+                    var users = await userv.GetAllAsync();
+                    foreach(var u in users)
+                    {
+                        var node = new TreeNode();
+                        node.Tag = u;
+                        node.Text = u.Name;
+                        node.ContextMenuStrip = userContextMenuStrip;
+                        root.Add(node);
+                    }
+                }
+            }catch(Exception exc)
+            {
+                MessageBox.Show(exc.ToString());
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async void userViewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await LoadUserView();
+        }
+
+        private async void editToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            TreeNode node = contextMenuHandlerGetNode(sender);
+            if (node == null) return;
+            var itemNode = node.Tag as Person;
+            if (itemNode == null) return;
+            var dialog = new UserDetailForm(itemNode);
+            dialog.ShowDialog(this);
+            await LoadUserView();
+        }
+
+        private async Task AddUser(Person p)
+        {
+            if (p is null || string.IsNullOrWhiteSpace(p.Name) || string.IsNullOrWhiteSpace(p.Pw)) return;
+            if (IsBusy) return;
+            IsBusy = true;
+            try
+            {
+                var userv = await ResourceManager.DataStore.GetUserServiceAsync();
+                if (await userv.CanCreateUserAsync())
+                {
+                    await userv.CreateUser(p.Name,p.Pw);
+                }
+                else
+                {
+                    MessageBox.Show("access denied");
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.ToString());
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async void addUserToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Person newUser = new Person();
+                Random rand = new Random(DateTime.Now.ToString().GetHashCode());
+                newUser.Name = "newUser" + rand.Next(100, 999);
+                newUser.Pw = rand.Next(100000, 999999).ToString();
+                await AddUser(newUser);
+                var dialog = new UserDetailForm(newUser);
+                dialog.ShowDialog(this);
+                await LoadUserView(true);
+            }
+            catch(Exception exc)
+            {
+                MessageBox.Show(exc.ToString());
+            }            
+        }
+
+        private void serverToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dialog = new ServerDetailForm();
+            dialog.ShowDialog(this);
         }
     }
 }

@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>http://rkp.intecelektro.de/heysteimkewindows/</InstallUrl>
+    <InstallUrl>http://rkp.intecelektro.de/heysteimke/heysteimkewindows/</InstallUrl>
     <TargetCulture>de</TargetCulture>
     <ProductName>HeySteimkeWindows</ProductName>
     <PublisherName>Marius Schlüter</PublisherName>
@@ -31,7 +31,7 @@
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>7</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -78,8 +78,8 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HeySteimkeDataLayer, Version=1.0.0.4, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\HeySteimkeDataLayer.1.0.4\lib\netstandard2.0\HeySteimkeDataLayer.dll</HintPath>
+    <Reference Include="HeySteimkeDataLayer, Version=1.0.0.8, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\HeySteimkeDataLayer.1.0.8\lib\netstandard2.0\HeySteimkeDataLayer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Rest.ClientRuntime, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Rest.ClientRuntime.2.3.21\lib\net461\Microsoft.Rest.ClientRuntime.dll</HintPath>
@@ -138,9 +138,27 @@
     <Compile Include="LoginForm.Designer.cs">
       <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="PlaceDetailForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlaceDetailForm.Designer.cs">
+      <DependentUpon>PlaceDetailForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceManager.cs" />
+    <Compile Include="ServerDetailForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ServerDetailForm.Designer.cs">
+      <DependentUpon>ServerDetailForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserDetailForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserDetailForm.Designer.cs">
+      <DependentUpon>UserDetailForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="HeySteimkeStart.resx">
       <DependentUpon>HeySteimkeStart.cs</DependentUpon>
     </EmbeddedResource>
@@ -149,6 +167,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="LoginForm.resx">
       <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlaceDetailForm.resx">
+      <DependentUpon>PlaceDetailForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -159,6 +180,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ServerDetailForm.resx">
+      <DependentUpon>ServerDetailForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserDetailForm.resx">
+      <DependentUpon>UserDetailForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="HeySteimkeWindows_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
