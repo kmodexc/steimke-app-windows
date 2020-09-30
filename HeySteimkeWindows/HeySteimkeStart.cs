@@ -2,6 +2,7 @@
 using HeySteimke.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -16,17 +17,17 @@ namespace HeySteimkeWindows
             InitializeComponent();
         }
 
-        private void recursiveTreeNodeExpanded(TreeNodeCollection nodes, string basekey, Dictionary<string,bool> expandDict)
+        private void recursiveTreeNodeExpanded(TreeNodeCollection nodes, string basekey, Dictionary<string, bool> expandDict)
         {
             if (nodes == null || expandDict == null || nodes.Count <= 0) return;
-            foreach(var subnode in nodes)
+            foreach (var subnode in nodes)
             {
                 var treeNodeSubNod = subnode as TreeNode;
-                if(treeNodeSubNod != null)
+                if (treeNodeSubNod != null)
                 {
                     var newKey = basekey + "->" + treeNodeSubNod.Text;
 
-                    if(expandDict.ContainsKey(newKey))
+                    if (expandDict.ContainsKey(newKey))
                     {
                         //throw new Exception("key " + newKey + " already exists");
                     }
@@ -43,7 +44,7 @@ namespace HeySteimkeWindows
             }
         }
 
-        public async Task LoadData()
+        public async Task LoadData(bool refresh = false)
         {
             if (IsBusy) return;
             IsBusy = true;
@@ -69,6 +70,12 @@ namespace HeySteimkeWindows
                 MessageBox.Show("guests cant use this program. contact admin if you need access");
                 IsBusy = false;
                 return;
+            }
+            if (refresh)
+            {
+                await pserv.RefreshAsync();
+                await iserv.RefreshAsync();
+                await userv.RefreshAsync();
             }
             var places = await pserv.GetAllAsync();
             if (places == null)
@@ -165,31 +172,9 @@ namespace HeySteimkeWindows
             idp.ShowDialog(this);
             await LoadData();
         }
-        private async void ItemsTreeView_DoubleClick(object sender, EventArgs e)
+        private void ItemsTreeView_DoubleClick(object sender, EventArgs e)
         {
-            try
-            {
-                if (ItemsTreeView.SelectedNode == null) return;
-                var placeNode = ItemsTreeView.SelectedNode.Tag as Place;
-                var itemNode = ItemsTreeView.SelectedNode.Tag as Item;
-                if (itemNode != null)
-                {
-                    await openItemDetail(itemNode);
-                }
-                else if (placeNode != null)
-                {
-                    await createItem(placeNode);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("No Handler for this");
-                }
-                await LoadData();
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show("Exception while process click:\n" + exc);
-            }
+
         }
 
         private async void execSkriptToolStripMenuItem_Click(object sender, EventArgs e)
@@ -209,12 +194,13 @@ namespace HeySteimkeWindows
             string str = "";
 
             // Work
-            var places = await dataBase.GetPlacesAsync();
+            var user1 = await userv.CreateUser("testmod", "192837465");
+            await userv.RefreshAsync();
+            var user2 = await userv.GetAsync(user1.Id);
+            str += user2.Id + "\n";
+            str += user2.Name + "\n";
+            str += user2.State + "\n";
 
-            foreach(var p in places)
-            {
-                str += p.Id + "\t" + p.Name + "\t" + p.CreatorId + "\n";
-            }
 
             MessageBox.Show(str);
         }
@@ -231,7 +217,7 @@ namespace HeySteimkeWindows
 
         private async void updateToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            await LoadData();
+            await LoadData(true);
         }
 
         private TreeNode contextMenuHandlerGetNode(object sender)
@@ -292,7 +278,7 @@ namespace HeySteimkeWindows
                     MessageBox.Show("access denied");
                 }
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 MessageBox.Show(exc.ToString());
             }
@@ -380,7 +366,7 @@ namespace HeySteimkeWindows
                     var root = ItemsTreeView.Nodes;
                     root.Clear();
                     var users = await userv.GetAllAsync();
-                    foreach(var u in users)
+                    foreach (var u in users)
                     {
                         var node = new TreeNode();
                         node.Tag = u;
@@ -389,7 +375,8 @@ namespace HeySteimkeWindows
                         root.Add(node);
                     }
                 }
-            }catch(Exception exc)
+            }
+            catch (Exception exc)
             {
                 MessageBox.Show(exc.ToString());
             }
@@ -415,17 +402,28 @@ namespace HeySteimkeWindows
             await LoadUserView();
         }
 
-        private async Task AddUser(Person p)
+        private async Task AddUser()
         {
-            if (p is null || string.IsNullOrWhiteSpace(p.Name) || string.IsNullOrWhiteSpace(p.Pw)) return;
             if (IsBusy) return;
             IsBusy = true;
             try
             {
                 var userv = await ResourceManager.DataStore.GetUserServiceAsync();
-                if (await userv.CanCreateUserAsync())
+
+                Person newUser = new Person();
+                Random rand = new Random(DateTime.Now.ToString().GetHashCode());
+                newUser.Name = "newUser" + rand.Next(100, 999);
+                newUser.Pw = rand.Next(100000, 999999).ToString();
+                newUser.State = UserState.user;
+
+                if (await userv.CanCreateAsync(newUser))
                 {
-                    await userv.CreateUser(p.Name,p.Pw);
+                    newUser = await userv.CreateAsync(newUser);
+                    if (newUser == null || newUser.Id <= 0)
+                        throw new Exception("create returned unvalid user");
+                    var dialog = new UserDetailForm(newUser);
+                    dialog.ShowDialog(this);
+                    await LoadUserView(true);
                 }
                 else
                 {
@@ -446,25 +444,100 @@ namespace HeySteimkeWindows
         {
             try
             {
-                Person newUser = new Person();
-                Random rand = new Random(DateTime.Now.ToString().GetHashCode());
-                newUser.Name = "newUser" + rand.Next(100, 999);
-                newUser.Pw = rand.Next(100000, 999999).ToString();
-                await AddUser(newUser);
-                var dialog = new UserDetailForm(newUser);
-                dialog.ShowDialog(this);
-                await LoadUserView(true);
+                await AddUser();
             }
-            catch(Exception exc)
+            catch (Exception exc)
             {
                 MessageBox.Show(exc.ToString());
-            }            
+            }
         }
 
         private void serverToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new ServerDetailForm();
             dialog.ShowDialog(this);
+        }
+
+        private async Task AddPlace()
+        {
+            if (IsBusy) return;
+            IsBusy = true;
+            try
+            {
+                var pserv = await ResourceManager.DataStore.GetPlacesServiceAsync();
+                if (await pserv.CanAddPlaceAsync())
+                {
+
+                    var newPlace = new Place();
+                    Random rand = new Random(DateTime.Now.ToString().GetHashCode());
+                    newPlace.Name = "newPlace" + rand.Next(100, 999);
+                    await pserv.CreateAsync(newPlace);
+                    foreach (var place in await pserv.GetAllAsync())
+                    {
+                        if (place.Name == newPlace.Name)
+                        {
+                            var dialog = new PlaceDetailForm(place);
+                            dialog.ShowDialog(this);
+                            await LoadData();
+                            return;
+                        }
+                    }
+                    throw new Exception("created place not found");
+                }
+                else
+                {
+                    MessageBox.Show("access denied");
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.ToString());
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async void addPlaceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            await AddPlace();
+        }
+
+        private async void deleteToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            TreeNode node = contextMenuHandlerGetNode(sender);
+            if (node == null) return;
+            var itemNode = node.Tag as Person;
+            if (itemNode == null) return;
+            await DeleteUser(itemNode);
+            await LoadUserView(true);
+        }
+
+        private async Task DeleteUser(Person itemNode)
+        {
+            if (IsBusy) return;
+            IsBusy = true;
+            try
+            {
+                var userv = await ResourceManager.DataStore.GetUserServiceAsync();
+                if (await userv.CanDeleteAsync(itemNode))
+                {
+                    await userv.DeleteAsync(itemNode);
+                }
+                else
+                {
+                    MessageBox.Show("access denied");
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.ToString());
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }

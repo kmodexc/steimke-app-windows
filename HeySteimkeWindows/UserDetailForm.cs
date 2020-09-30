@@ -58,7 +58,7 @@ namespace HeySteimkeWindows
                 }
 
                 var userv = await ResourceManager.DataStore.GetUserServiceAsync();
-                if (!await userv.CanEditUserAsync(person))
+                if (!await userv.CanUpdateAsync(person))
                 {
                     MessageBox.Show("access denied");
                     IsBusy = false;
@@ -74,7 +74,7 @@ namespace HeySteimkeWindows
                     person.State = (UserState)Enum.Parse(typeof(UserState), stateTextBox.Text);
                 }
 
-                await userv.UpdateUserAsync(person);
+                await userv.UpdateAsync(person);
             }
             catch (Exception exc)
             {

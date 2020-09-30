@@ -94,7 +94,7 @@ namespace HeySteimkeWindows
             {
                 MessageBox.Show("Item ID invalid");
             }
-            else if (await iserv.CanEditAsync(item))
+            else if (!await iserv.CanEditAsync(item))
             {
                 MessageBox.Show("No permission to edit");
             }
